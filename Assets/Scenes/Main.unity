@@ -374,11 +374,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  sneakSpeed: 2
   rotationSpeed: 10
   jumpHeight: 3
   gravity: -9.81
   cam: {fileID: 330585546}
   animator: {fileID: 1449493804}
+  playerInput: {fileID: 152710059}
 --- !u!143 &152710062
 CharacterController:
   m_ObjectHideFlags: 0

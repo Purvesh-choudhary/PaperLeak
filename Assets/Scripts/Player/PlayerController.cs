@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform cam;
     [SerializeField] private Animator animator;
+    [SerializeField] private PlayerInput playerInput;
 
     private CharacterController _controller;
     private Vector3 _velocity;
@@ -28,11 +29,16 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
+        playerInput = GetComponent<PlayerInput>();
     }
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+
+        playerInput.actions["Sneak"].performed += ctx =>_isSneaking = true;
+        playerInput.actions["Sneak"].canceled += ctx => _isSneaking = false;
+
     }
 
     private void Update()
@@ -89,11 +95,15 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    public void OnSneak(InputValue value)
-    {
-        _isSneaking = value.isPressed;
-        
-    }
+    // public void OnSneak(InputValue value)
+    // {
+    //     _isSneaking = value.isPressed;
+    //     if (value.isPressed)
+    //         Debug.Log("Sprint STARTED");
+    //     else
+    //         Debug.Log("Sprint ENDED");
+            
+    // }
 
     private void HandleMovement()
     {
