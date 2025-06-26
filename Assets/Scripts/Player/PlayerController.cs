@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
+    public float sneakSpeed = 2f;
     public float rotationSpeed = 10f;
     public float jumpHeight = 3f;
     public float gravity = -9.81f;
@@ -13,12 +14,14 @@ public class PlayerController : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform cam;
     [SerializeField] private Animator animator;
+    [SerializeField] private PlayerInput playerInput;
 
     private CharacterController _controller;
     private Vector3 _velocity;
     private Vector2 _inputMove;
     private bool _isGrounded;
-
+    private bool _isSneaking;
+    
     private float _turnSmoothVelocity;
     private float _turnSmoothTime = 0.1f;
     private bool _wasGroundedLastFrame = true;
@@ -26,11 +29,16 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
+        playerInput = GetComponent<PlayerInput>();
     }
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+
+        playerInput.actions["Sneak"].performed += ctx =>_isSneaking = true;
+        playerInput.actions["Sneak"].canceled += ctx => _isSneaking = false;
+
     }
 
     private void Update()
@@ -87,10 +95,20 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    // public void OnSneak(InputValue value)
+    // {
+    //     _isSneaking = value.isPressed;
+    //     if (value.isPressed)
+    //         Debug.Log("Sprint STARTED");
+    //     else
+    //         Debug.Log("Sprint ENDED");
+            
+    // }
 
     private void HandleMovement()
     {
         _isGrounded = _controller.isGrounded;
+        float _currentMoveSpeed = _isSneaking ? sneakSpeed : moveSpeed;
 
         Vector3 direction = new Vector3(_inputMove.x, 0f, _inputMove.y).normalized;
 
@@ -102,15 +120,31 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            _controller.Move(moveDir.normalized * moveSpeed * Time.deltaTime);
+            _controller.Move(moveDir.normalized * _currentMoveSpeed * Time.deltaTime);
 
             if (animator != null)
-                animator.SetBool("isRunning", true);
+            {
+                if (_isSneaking)
+                {
+                    animator.SetBool("IsSneaking", true);
+                    animator.SetBool("isRunning", false);
+
+                }
+                else
+                {
+                    animator.SetBool("isRunning", true);
+                    animator.SetBool("IsSneaking", false);
+                }
+            }
         }
         else
         {
             if (animator != null)
+            {
                 animator.SetBool("isRunning", false);
+                animator.SetBool("IsSneaking", false);
+            }
+                
         }
     }
 
