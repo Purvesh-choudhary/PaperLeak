@@ -7,12 +7,13 @@ public class PlayerInteract : MonoBehaviour
     [SerializeField] float interactRange = 1.5f;
     [SerializeField] LayerMask interactableLayer;
 
-    void Update()
+    [SerializeField] Transform holdpoint;
+    [SerializeField] float throwForce = 5f;
+    [SerializeField] IPickupable heldObject;
+
+    public void OnInteract()
     {
-        if (Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            TryInteract();
-        }
+        TryInteract();
     }
 
     void TryInteract()
@@ -36,9 +37,23 @@ public class PlayerInteract : MonoBehaviour
             }
         }
 
-        if (closestInteractable != null)
+        if (heldObject != null)
+        {
+            Vector3 throwDir = interactOrigin.forward;
+            heldObject.OnThrow(throwDir * throwForce);
+            heldObject = null;
+        }
+        else if (closestInteractable != null)
         {
             closestInteractable.Interact();
+
+            IPickupable pickupable = closestInteractable as IPickupable;
+            if (pickupable != null)
+            {
+                pickupable.OnPickup(holdpoint);
+                heldObject = pickupable;
+            }
+
         }
     }
 
