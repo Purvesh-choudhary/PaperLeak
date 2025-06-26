@@ -3,13 +3,12 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteract : MonoBehaviour
 {
-    public float interactDistance = 2f;
-    public LayerMask interactableLayer;
-    public Transform interactOrigin;
+    [SerializeField] Transform interactOrigin;
+    [SerializeField] float interactRange = 1.5f;
+    [SerializeField] LayerMask interactableLayer;
 
     void Update()
     {
-
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
             TryInteract();
@@ -18,13 +17,37 @@ public class PlayerInteract : MonoBehaviour
 
     void TryInteract()
     {
-        if (Physics.Raycast(interactOrigin.position, interactOrigin.forward, out RaycastHit hit, interactDistance, interactableLayer))
+        Collider[] colliders = Physics.OverlapSphere(interactOrigin.position, interactRange, interactableLayer);
+
+        float closestDistance = Mathf.Infinity;
+        IInteractable closestInteractable = null;
+
+        foreach (Collider collider in colliders)
         {
-            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+            IInteractable interactable = collider.GetComponent<IInteractable>();
             if (interactable != null)
             {
-                interactable.Interact();
+                float distance = Vector3.Distance(interactOrigin.position, collider.transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestInteractable = interactable;
+                }
             }
         }
+
+        if (closestInteractable != null)
+        {
+            closestInteractable.Interact();
+        }
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        if (interactOrigin != null)
+            Gizmos.DrawWireSphere(interactOrigin.position, interactRange);
+    }
+
+
 }
