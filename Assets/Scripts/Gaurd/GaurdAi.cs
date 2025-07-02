@@ -1,3 +1,4 @@
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -5,43 +6,34 @@ using UnityEngine.AI;
 public class GaurdAi : MonoBehaviour
 {
 
-    [SerializeField] float moveSpeed = 2f;
-    [SerializeField] float chaseSpeed = 5f;
-    [SerializeField] float distanceToReachBeforeChangingPoint = 2f;
+    GaurdState currentGaurdState;
 
-    [SerializeField] Transform[] patrolPoints;
-    [SerializeField] Transform currentPointToGo;
+    public Transform[] patrolPoints;
+    public Transform player;
+    public float detectionRange = 5f;
+    public NavMeshAgent agent;
 
-    [SerializeField] bool isPatrolling;
 
-    NavMeshAgent agent;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
-        currentPointToGo = patrolPoints[0];
-        agent.SetDestination(currentPointToGo.position);
+        SwitchState(GaurdPatrolState(this));
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Patrol();
+        currentGaurdState?.Update();
     }
 
-    void Patrol()
+    void SwitchState(GaurdState newState)
     {
-        if (Vector3.Distance(transform.position, currentPointToGo.position) < distanceToReachBeforeChangingPoint)
-        {
-            currentPointToGo = patrolPoints[Random.Range(0, patrolPoints.Length)];
-            agent.SetDestination(currentPointToGo.position);
-        }
+        currentGaurdState?.Exit();
+        currentGaurdState = newState;
+        currentGaurdState?.Exit();
     }
 
-    void Chase()
+    public bool CanSeePlayer()
     {
-
+        // Simple range-based detection
+        return Vector3.Distance(transform.position, player.position) <= detectionRange;
     }
-
 }
