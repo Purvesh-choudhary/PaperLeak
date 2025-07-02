@@ -1,13 +1,34 @@
 using UnityEngine;
 
-public class GaurdPatrolState : GaurdAi
+public class GaurdPatrolState : GaurdState
 {
-    private GaurdAi gaurdAi;
+    int currentWaypoint = 0;
+    public GaurdPatrolState(GaurdAi gaurd) : base(gaurd) { }
 
-    public GaurdPatrolState(GaurdAi gaurdAi)
+
+
+
+    public override void Enter()
     {
-        this.gaurdAi = gaurdAi;
+        gaurd.agent.isStopped = false;
+        gaurd.agent.SetDestination(gaurd.patrolPoints[currentWaypoint].position);
     }
 
-    
+    public override void Update()
+    {
+        if (gaurd.CanSeePlayer())
+        {
+            gaurd.SwitchState(new GaurdChaseState(gaurd));
+            return;
+        }
+
+        // Move to next waypoint if reached
+        if (!gaurd.agent.pathPending && gaurd.agent.remainingDistance < 0.5f)
+        {
+            currentWaypoint = (currentWaypoint + 1) % gaurd.patrolPoints.Length;
+            gaurd.agent.SetDestination(gaurd.patrolPoints[currentWaypoint].position);
+        }
+    }
+
+
 }

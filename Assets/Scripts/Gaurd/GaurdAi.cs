@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class GaurdAi : MonoBehaviour
 {
 
-    GaurdState currentGaurdState;
+    GaurdState currentState;
 
     public Transform[] patrolPoints;
     public Transform player;
@@ -16,19 +16,19 @@ public class GaurdAi : MonoBehaviour
 
     void Start()
     {
-        SwitchState(GaurdPatrolState(this));
+        SwitchState(new GaurdPatrolState(this));
     }
 
     void Update()
     {
-        currentGaurdState?.Update();
+        currentState?.Update();
     }
 
-    void SwitchState(GaurdState newState)
+    public void SwitchState(GaurdState newState)
     {
-        currentGaurdState?.Exit();
-        currentGaurdState = newState;
-        currentGaurdState?.Exit();
+        currentState?.Exit();
+        currentState = newState;
+        currentState?.Exit();
     }
 
     public bool CanSeePlayer()

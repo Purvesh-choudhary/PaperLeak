@@ -1,16 +1,28 @@
 using UnityEngine;
 
-public class GaurdSearchState : MonoBehaviour
+public class GaurdSearchState : GaurdState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    float searchTime = 3f;
+    float timer = 0f;
+    
+    public GaurdSearchState(GaurdAi gaurd) : base(gaurd) { }
+
+
+
+    
+    public override void Enter()
     {
-        
+        gaurd.agent.isStopped = true;
+        timer = 0f;
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void Update()
     {
-        
+        timer += Time.deltaTime;
+        if (timer >= searchTime)
+        {
+            gaurd.SwitchState(new GaurdPatrolState(gaurd));
+        }
     }
+
 }
