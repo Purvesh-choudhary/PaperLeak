@@ -1,5 +1,3 @@
-
-
 public class GaurdChaseState : GaurdState
 {
     public GaurdChaseState(GaurdAi gaurd) : base(gaurd) { }
@@ -7,6 +5,7 @@ public class GaurdChaseState : GaurdState
     public override void Enter()
     {
         gaurd.agent.isStopped = false;
+        gaurd.agent.speed = gaurd.chaseSpeed;
     }
 
     public override void Update()

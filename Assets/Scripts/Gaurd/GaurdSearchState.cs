@@ -6,12 +6,10 @@ public class GaurdSearchState : GaurdState
     float timer = 0f;
     
     public GaurdSearchState(GaurdAi gaurd) : base(gaurd) { }
-
-
-
-    
+  
     public override void Enter()
     {
+        searchTime = gaurd.searchTime;
         gaurd.agent.isStopped = true;
         timer = 0f;
     }

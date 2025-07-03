@@ -5,12 +5,10 @@ public class GaurdPatrolState : GaurdState
     int currentWaypoint = 0;
     public GaurdPatrolState(GaurdAi gaurd) : base(gaurd) { }
 
-
-
-
     public override void Enter()
     {
         gaurd.agent.isStopped = false;
+        gaurd.agent.speed = gaurd.patrolSpeed;
         gaurd.agent.SetDestination(gaurd.patrolPoints[currentWaypoint].position);
     }
 
